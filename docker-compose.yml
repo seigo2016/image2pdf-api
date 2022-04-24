@@ -1,0 +1,10 @@
+services:
+  image2pdf_api:
+    container_name: "image2pdf_api"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    tty: true
+    ports:
+      - 10085:10085

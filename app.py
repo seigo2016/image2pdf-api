@@ -1,16 +1,26 @@
-from email import header
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, File
+from pydantic import BaseModel
+from starlette.middleware.cors import CORSMiddleware
 import img2pdf
-from PIL import Image
-import os
 from typing import List
 from fastapi.responses import Response
-
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["get","post"],
+    allow_headers=["*"]
+)
 
 @app.post('/convert')
-async def get_file(files: List[UploadFile]):
+async def get_file(filename: str="default.pdf", files: List[UploadFile] =  File(...)):
+    print(filename)
+    if not filename.endswith(".pdf"):
+        filename = filename + ".pdf"
     data = []
     for f in files:
         if not (f.content_type == "image/jpeg" or f.content_type == "image/png"):
@@ -21,7 +31,7 @@ async def get_file(files: List[UploadFile]):
 
     pdf_data = img2pdf.convert(data)
     headers = {
-        'Content-Disposition': 'attachment; filename="test.pdf"'
+        'Content-Disposition': f'attachment; filename="{filename}"'
     }
 
     return Response(content=pdf_data, headers=headers,  media_type="application/pdf")
