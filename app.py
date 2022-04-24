@@ -1,5 +1,5 @@
+from ast import Bytes
 from fastapi import FastAPI, UploadFile, File
-from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 import img2pdf
 from typing import List
@@ -17,11 +17,10 @@ app.add_middleware(
 )
 
 @app.post('/convert')
-async def get_file(filename: str="default.pdf", files: List[UploadFile] =  File(...)):
-    print(filename)
+async def get_file(filename: str="default.pdf", files: List[UploadFile] =  File(...)) -> Response:
     if not filename.endswith(".pdf"):
         filename = filename + ".pdf"
-    data = []
+    data: List[Bytes] = []
     for f in files:
         if not (f.content_type == "image/jpeg" or f.content_type == "image/png"):
             return Response(status_code=400, content="Only jpeg and png files are allowed")
@@ -29,7 +28,8 @@ async def get_file(filename: str="default.pdf", files: List[UploadFile] =  File(
         d = await f.read()
         data.append(d)
 
-    pdf_data = img2pdf.convert(data)
+    pdf_data:Bytes = img2pdf.convert(data)
+
     headers = {
         'Content-Disposition': f'attachment; filename="{filename}"'
     }
