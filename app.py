@@ -5,13 +5,14 @@ import img2pdf
 from typing import List
 from fastapi.responses import Response
 from PIL import ImageFile
-ImageFile.LOAD_TRUNCATED_IMAGES = True
-app = FastAPI()
 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["https://img2pdf.seigo2016.com"],
+    allow_credentials=False,
     allow_methods=["get","post"],
     allow_headers=["*"]
 )
